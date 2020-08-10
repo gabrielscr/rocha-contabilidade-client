@@ -1,12 +1,15 @@
 import 'package:dio/dio.dart';
 import 'package:rocha_contabilidade/app/shared/domain/auth-result.dart';
 import 'package:rocha_contabilidade/app/shared/domain/result.dart';
-import 'package:rocha_contabilidade/app/utils/constants.dart';
+import 'package:rocha_contabilidade/app/shared/domain/usuario.dart';
+import 'package:rocha_contabilidade/app/shared/repository/api-repository.dart';
 
 class AuthRepository {
+  ApiRepository apiRepository = ApiRepository();
+
   Future<AuthResult> login(params) async {
     try {
-      var response = await Dio().post(Constants.apiUrl, data: params);
+      var response = await apiRepository.post('Auth/Autenticar', params);
 
       AuthResult auth = AuthResult.fromJson(response.data);
 
@@ -18,10 +21,16 @@ class AuthRepository {
   }
 
   Future<Resultado> cadastrar(params) async {
-    var response = await Dio().post(Constants.apiUrl, data: params);
+    var response = await apiRepository.post('Auth/Cadastrar', params);
 
     Resultado resultado = Resultado.fromJson(response.data);
 
     return resultado;
+  }
+
+  Future<Usuario> obterUsuario() async {
+    var response = await apiRepository.get('Auth/ObterUsuario', {});
+
+    return Usuario.fromJson(response.data);
   }
 }

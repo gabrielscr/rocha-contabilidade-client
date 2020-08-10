@@ -1,27 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:rocha_contabilidade/app/admin/views/home-admin-view.dart';
-import 'package:rocha_contabilidade/app/cliente/views/home-view.dart';
 import 'package:rocha_contabilidade/app/shared/controllers/auth-controller.dart';
-
-import 'login-view.dart';
+import 'package:rocha_contabilidade/app/widgets/text-widget.dart';
 
 class SplashView extends StatelessWidget {
-  final bool isLoggedIn = true;
-  final bool isCliente = false;
+  final AuthController authController = Get.put(AuthController());
 
   @override
   Widget build(BuildContext context) {
     return GetBuilder<AuthController>(
       init: AuthController(),
+      initState: (_) {
+        authController.verificarLogin();
+      },
       builder: (controller) {
-        if (isLoggedIn) {
-          if (isCliente)
-            return HomeView();
-          else
-            return HomeAdminView();
-        } else
-          return LoginView();
+        return Scaffold(
+          body: Container(
+            child: Center(
+              child: TextWidget(
+                text: 'ROCHA CONTABILIDADE',
+                fontWeight: FontWeight.bold,
+                fontSize: 25,
+              ),
+            ),
+          ),
+        );
       },
     );
   }

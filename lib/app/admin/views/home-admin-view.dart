@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:responsive_builder/responsive_builder.dart';
-import 'package:rocha_contabilidade/app/cliente/views/atendimento-view.dart';
+import 'package:rocha_contabilidade/app/cliente/views/chamado-listar-view.dart';
 import 'package:rocha_contabilidade/app/cliente/views/chamado-view.dart';
-import 'package:rocha_contabilidade/app/shared/views/login-view.dart';
+import 'package:rocha_contabilidade/app/shared/controllers/auth-controller.dart';
+import 'package:rocha_contabilidade/app/shared/controllers/theme-controller.dart';
 import 'package:rocha_contabilidade/app/utils/common.dart';
+import 'package:rocha_contabilidade/app/utils/routes.dart';
 import 'package:rocha_contabilidade/app/widgets/text-widget.dart';
 
 class HomeAdminView extends StatelessWidget {
@@ -14,6 +16,8 @@ class HomeAdminView extends StatelessWidget {
   );
 
   final GlobalKey<ScaffoldState> menuKey = new GlobalKey<ScaffoldState>();
+
+  final AuthController authController = Get.put(AuthController());
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +47,7 @@ class HomeAdminView extends StatelessWidget {
     return AppBar(
       title: TextWidget(text: 'Rocha Contabilidade'),
       elevation: 0,
-      backgroundColor: Colors.white,
+      backgroundColor: isModoDark ? Colors.black : Colors.white,
       leading: sizingInfo.isMobile || sizingInfo.isTablet
           ? IconButton(
               icon: Icon(
@@ -56,7 +60,19 @@ class HomeAdminView extends StatelessWidget {
         Row(
           children: [
             TextWidget(text: 'Escurecer tela'),
-            Switch(value: false, onChanged: null),
+            Switch(
+              value: ThemeController.to.modoDark.value,
+              onChanged: (bool v) {
+                if (v) {
+                  ThemeController.to.modoDark.value = v;
+                  ThemeController.to.changeTheme(ThemeMode.dark);
+                } else {
+                  ThemeController.to.modoDark.value = v;
+                  ThemeController.to.changeTheme(ThemeMode.light);
+                }
+              },
+              activeColor: isModoDark ? Colors.grey : Colors.deepPurpleAccent,
+            ),
           ],
         )
       ],
@@ -67,17 +83,23 @@ class HomeAdminView extends StatelessWidget {
     return Container(
         width: Get.width / 6,
         height: Get.height,
-        color: Colors.grey[300],
+        color: isModoDark ? Colors.grey[800] : Colors.grey[300],
         child: renderMenuItens());
   }
 
-  ListTile renderMenuItem(IconData icon, String title, String subtitle,
-      String route, int pageIndex) {
+  ListTile renderMenuItem(
+      IconData icon, String title, String subtitle, Function onTap) {
     return ListTile(
-      leading: Icon(icon),
+      leading: Padding(
+        padding: const EdgeInsets.only(top: 8.0),
+        child: Icon(
+          icon,
+          color: isModoDark ? Colors.white : Colors.black,
+        ),
+      ),
       title: TextWidget(text: title),
       subtitle: TextWidget(text: subtitle),
-      onTap: () => controller.jumpToPage(pageIndex),
+      onTap: onTap,
     );
   }
 
@@ -86,7 +108,7 @@ class HomeAdminView extends StatelessWidget {
       child: Container(
         child: PageView(
           controller: controller,
-          children: [AtendimentoView(), ChamadoView()],
+          children: [ChamadoListarView(), ChamadoView()],
         ),
       ),
     );
@@ -96,24 +118,20 @@ class HomeAdminView extends StatelessWidget {
     return ListView(
       children: [
         ListTile(
-          title: TextWidget(text: 'Olá, Gabriel!'),
-          subtitle: TextWidget(text: 'Bem vindo a Rocha Contabilidade'),
+          title: TextWidget(text: 'Olá, ${authController.usuario.value.nome}.'),
+          subtitle: TextWidget(text: 'Seja bem vindo!'),
           trailing: IconButton(
               icon: Icon(MdiIcons.logout),
-              onPressed: () => Get.to(LoginView())),
+              onPressed: () => AuthController.to.logoff()),
         ),
-        renderMenuItem(Icons.headset_mic, 'Atendimento online',
-            'Tire suas dúvidas com nosso chat online', '/', 0),
+        renderMenuItem(Icons.headset_mic, 'Meus atendimentos',
+            'Consulte seus chamados', () => controller.jumpToPage(0)),
         Divider(
           color: Colors.grey[400],
           thickness: 0.5,
         ),
-        renderMenuItem(
-            Icons.email,
-            'Abrir chamado',
-            'Solicite melhorias, sugestões e atendimentos personalizados',
-            '/',
-            1)
+        renderMenuItem(Icons.email, 'Abrir chamado', 'Toque aqui para abrir',
+            () => goTo('chamado-abrir'))
       ],
     );
   }

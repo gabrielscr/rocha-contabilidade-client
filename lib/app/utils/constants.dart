@@ -1,3 +1,3 @@
 class Constants {
-  static String apiUrl = "";
+  static String apiUrl = "https://rochacontabilidade.gscr.ml";
 }

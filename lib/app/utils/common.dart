@@ -40,6 +40,13 @@ exibirSnackSucesso(String mensagem) {
 
 bool get isModoDark => ThemeController.to.modoDark.value;
 
+bool isFromMe(String usuarioId) {
+  if (usuarioId == AuthController.to.usuario.value.usuarioId)
+    return true;
+  else
+    return false;
+}
+
 Map<String, String> get headers =>
     {'Authorization': 'Bearer ${AuthController.to.usuario.value.token}'};
 
