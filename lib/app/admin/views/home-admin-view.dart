@@ -28,12 +28,7 @@ class HomeAdminView extends StatelessWidget {
           appBar: renderAppBar(sizingInfo),
           body: Container(
               child: Row(
-            children: [
-              sizingInfo.isMobile || sizingInfo.isTablet
-                  ? renderNothing()
-                  : renderMenu(),
-              renderBody(sizingInfo)
-            ],
+            children: [sizingInfo.isMobile || sizingInfo.isTablet ? renderNothing() : renderMenu(), renderBody(sizingInfo)],
           )),
           drawer: Drawer(
             child: renderMenuItens(),
@@ -59,20 +54,17 @@ class HomeAdminView extends StatelessWidget {
       actions: [
         Row(
           children: [
-            TextWidget(text: 'Escurecer tela'),
-            Switch(
-              value: ThemeController.to.modoDark.value,
-              onChanged: (bool v) {
-                if (v) {
-                  ThemeController.to.modoDark.value = v;
-                  ThemeController.to.changeTheme(ThemeMode.dark);
-                } else {
-                  ThemeController.to.modoDark.value = v;
-                  ThemeController.to.changeTheme(ThemeMode.light);
-                }
-              },
-              activeColor: isModoDark ? Colors.grey : Colors.deepPurpleAccent,
-            ),
+            IconButton(
+                icon: Icon(MdiIcons.moonLastQuarter),
+                onPressed: () {
+                  ThemeController.to.modoDark.value = !ThemeController.to.modoDark.value;
+
+                  if (ThemeController.to.modoDark.value) {
+                    ThemeController.to.changeTheme(ThemeMode.dark);
+                  } else {
+                    ThemeController.to.changeTheme(ThemeMode.light);
+                  }
+                }),
           ],
         )
       ],
@@ -80,15 +72,10 @@ class HomeAdminView extends StatelessWidget {
   }
 
   renderMenu() {
-    return Container(
-        width: Get.width / 6,
-        height: Get.height,
-        color: isModoDark ? Colors.grey[800] : Colors.grey[300],
-        child: renderMenuItens());
+    return Container(width: Get.width / 6, height: Get.height, color: isModoDark ? Colors.grey[800] : Colors.grey[300], child: renderMenuItens());
   }
 
-  ListTile renderMenuItem(
-      IconData icon, String title, String subtitle, Function onTap) {
+  ListTile renderMenuItem(IconData icon, String title, String subtitle, Function onTap) {
     return ListTile(
       leading: Padding(
         padding: const EdgeInsets.only(top: 8.0),
@@ -120,18 +107,14 @@ class HomeAdminView extends StatelessWidget {
         ListTile(
           title: TextWidget(text: 'Olá, ${authController.usuario.value.nome}.'),
           subtitle: TextWidget(text: 'Seja bem vindo!'),
-          trailing: IconButton(
-              icon: Icon(MdiIcons.logout),
-              onPressed: () => AuthController.to.logoff()),
+          trailing: IconButton(icon: Icon(MdiIcons.logout), onPressed: () => AuthController.to.logoff()),
         ),
-        renderMenuItem(Icons.headset_mic, 'Meus atendimentos',
-            'Consulte seus chamados', () => controller.jumpToPage(0)),
+        renderMenuItem(Icons.headset_mic, 'Meus atendimentos', 'Consulte seus chamados', () => controller.jumpToPage(0)),
         Divider(
           color: Colors.grey[400],
           thickness: 0.5,
         ),
-        renderMenuItem(Icons.email, 'Abrir chamado', 'Toque aqui para abrir',
-            () => goTo('chamado-abrir'))
+        renderMenuItem(Icons.email, 'Abrir chamado', 'Toque aqui para abrir', () => goTo('chamado-abrir'))
       ],
     );
   }

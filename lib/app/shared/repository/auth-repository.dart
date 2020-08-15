@@ -3,6 +3,7 @@ import 'package:rocha_contabilidade/app/shared/domain/auth-result.dart';
 import 'package:rocha_contabilidade/app/shared/domain/result.dart';
 import 'package:rocha_contabilidade/app/shared/domain/usuario.dart';
 import 'package:rocha_contabilidade/app/shared/repository/api-repository.dart';
+import 'package:rocha_contabilidade/app/utils/routes.dart';
 
 class AuthRepository {
   ApiRepository apiRepository = ApiRepository();
@@ -31,6 +32,11 @@ class AuthRepository {
   Future<Usuario> obterUsuario() async {
     var response = await apiRepository.get('Auth/ObterUsuario', {});
 
-    return Usuario.fromJson(response.data);
+    if (response.statusCode == 200)
+      return Usuario.fromJson(response.data);
+    else {
+      goTo('login');
+      return null;
+    }
   }
 }

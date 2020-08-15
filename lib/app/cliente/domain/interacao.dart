@@ -1,21 +1,24 @@
 class Interacao {
   int chamadoId;
   String mensagem;
-  List<String> anexos;
+  String anexoBase64;
+  String anexoNome;
 
-  Interacao({this.chamadoId, this.mensagem, this.anexos});
+  Interacao({this.chamadoId, this.mensagem, this.anexoBase64, this.anexoNome});
 
   Interacao.fromJson(Map<String, dynamic> json) {
     chamadoId = json['chamadoId'];
     mensagem = json['mensagem'];
-    anexos = json['anexos'].cast<String>();
+    anexoBase64 = json['anexoBase64'];
+    anexoNome = json['anexoNome'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['chamadoId'] = this.chamadoId;
     data['mensagem'] = this.mensagem;
-    data['anexos'] = this.anexos;
+    data['anexoBase64'] = this.anexoBase64;
+    data['anexoNome'] = this.anexoNome;
     return data;
   }
 }

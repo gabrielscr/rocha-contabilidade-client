@@ -8,7 +8,7 @@ import 'package:rocha_contabilidade/app/utils/validators.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthController extends GetxController {
-  static AuthController get to => Get.find();
+  static AuthController get to => Get.put(AuthController());
 
   AuthResult authResult = AuthResult();
 
@@ -20,9 +20,7 @@ class AuthController extends GetxController {
 
   RxBool carregando = false.obs;
 
-  bool get isValidLogin =>
-      Validators().validarEmail() == null &&
-      Validators().validarSenha() == null;
+  bool get isValidLogin => Validators().validarEmail() == null && Validators().validarSenha() == null;
 
   @override
   onInit() {
@@ -48,8 +46,7 @@ class AuthController extends GetxController {
 
     final SharedPreferences prefs = await sharedPreferences;
 
-    authResult = await authRepository
-        .login({'Email': usuario.value.email, 'Senha': usuario.value.senha});
+    authResult = await authRepository.login({'Email': usuario.value.email, 'Senha': usuario.value.senha});
 
     if (authResult.authenticated) {
       await prefs.setString('token', authResult.accessToken);
@@ -65,7 +62,7 @@ class AuthController extends GetxController {
   logoff() async {
     final SharedPreferences prefs = await sharedPreferences;
     prefs.remove('token');
-    goTo('/');
+    goToAll('login');
   }
 
   changeCarregando(bool value) {

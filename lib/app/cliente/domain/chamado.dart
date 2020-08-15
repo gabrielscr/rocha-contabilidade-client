@@ -6,13 +6,7 @@ class Chamado {
   String ultimaInteracaoPor;
   List<Interacoes> interacoes;
 
-  Chamado(
-      {this.id,
-      this.titulo,
-      this.dataHora,
-      this.usuarioId,
-      this.ultimaInteracaoPor,
-      this.interacoes});
+  Chamado({this.id, this.titulo, this.dataHora, this.usuarioId, this.ultimaInteracaoPor, this.interacoes});
 
   Chamado.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -47,23 +41,19 @@ class Interacoes {
   String usuarioId;
   String dataHora;
   String mensagem;
-  List<String> anexos;
+  String anexoNome;
+  String anexoCaminho;
   String usuarioNome;
 
-  Interacoes(
-      {this.id,
-      this.usuarioId,
-      this.dataHora,
-      this.mensagem,
-      this.anexos,
-      this.usuarioNome});
+  Interacoes({this.id, this.usuarioId, this.dataHora, this.mensagem, this.anexoNome, this.anexoCaminho, this.usuarioNome});
 
   Interacoes.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     usuarioId = json['usuarioId'];
     dataHora = json['dataHora'];
     mensagem = json['mensagem'];
-    anexos = json['anexos'].cast<String>();
+    anexoNome = json['anexoNome'];
+    anexoCaminho = json['anexoCaminho'];
     usuarioNome = json['usuarioNome'];
   }
 
@@ -73,7 +63,8 @@ class Interacoes {
     data['usuarioId'] = this.usuarioId;
     data['dataHora'] = this.dataHora;
     data['mensagem'] = this.mensagem;
-    data['anexos'] = this.anexos;
+    data['anexoNome'] = this.anexoNome;
+    data['anexoCaminho'] = this.anexoCaminho;
     data['usuarioNome'] = this.usuarioNome;
     return data;
   }

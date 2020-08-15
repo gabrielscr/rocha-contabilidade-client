@@ -9,6 +9,7 @@ import 'app/shared/controllers/theme-controller.dart';
 import 'app/shared/views/splash-view.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   Get.lazyPut<ThemeController>(() => ThemeController());
   ThemeController.to.getThemeMode();
   runApp(MyApp());
