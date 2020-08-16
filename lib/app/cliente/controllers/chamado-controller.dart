@@ -1,4 +1,9 @@
+import 'dart:convert';
+
+import 'package:dio/dio.dart';
+import 'package:file_picker_cross/file_picker_cross.dart';
 import 'package:get/get.dart';
+import 'package:http_parser/http_parser.dart';
 import 'package:rocha_contabilidade/app/cliente/domain/anexo.dart';
 import 'package:rocha_contabilidade/app/cliente/domain/arquivo.dart';
 import 'package:rocha_contabilidade/app/cliente/domain/chamado.dart';
@@ -9,8 +14,6 @@ import 'package:rocha_contabilidade/app/cliente/repository/upload-repository.dar
 
 class ChamadoController extends GetxController {
   ChamadoRepository repository = ChamadoRepository();
-
-  UploadRepository uploadRepository = UploadRepository();
 
   Rx<Chamado> chamado = Chamado().obs;
 
@@ -52,12 +55,35 @@ class ChamadoController extends GetxController {
     carregandoInteracao.value = value;
   }
 
-  registrarInteracao() async {
+  registrarInteracao({FilePickerCross cross}) async {
     changeCarregandoInteracao(true);
+
     interacao.value.chamadoId = chamado.value.id;
-    await repository.registrarInteracao(interacao.value.toJson());
+
+    var xd = MultipartFile.fromBytes(cross.toUint8List(), filename: cross.path.replaceAll('C:/fakepath/', ''));
+
+    if (cross != null) {
+      var formData = FormData();
+      formData.files.addAll([
+        MapEntry(
+          "anexo",
+          xd,
+        )
+      ]);
+
+      formData.fields.add(MapEntry('chamadoId', chamado.value.id.toString()));
+
+      // FormData formData = FormData.fromMap({'chamadoId': chamado.value.id, 'mensagem': interacao.value.mensagem, 'anexo': xd});
+
+      await repository.registrarInteracao(formData);
+    } else {
+      await repository.registrarInteracao(interacao.value.toJson());
+    }
+
     obter(chamado.value.id);
+
     limparInteracao();
+
     changeCarregandoInteracao(false);
   }
 

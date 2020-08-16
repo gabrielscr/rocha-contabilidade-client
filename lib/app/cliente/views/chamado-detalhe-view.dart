@@ -26,8 +26,6 @@ class _ChamadoDetalheViewState extends State<ChamadoDetalheView> {
 
   final ChamadoController chamadoController = Get.put(ChamadoController());
 
-  final ChatController chatController = Get.put(ChatController());
-
   final ScrollController scrollController = ScrollController();
 
   final TextEditingController msgController = TextEditingController();
@@ -42,7 +40,6 @@ class _ChamadoDetalheViewState extends State<ChamadoDetalheView> {
   Widget build(BuildContext context) {
     return GetX<ChamadoController>(initState: (_) async {
       chamadoController.obter(int.parse(id));
-      chatController.iniciarSocket();
     }, builder: (controller) {
       return Scaffold(
           appBar: renderAppBar(),
@@ -61,7 +58,6 @@ class _ChamadoDetalheViewState extends State<ChamadoDetalheView> {
             color: isModoDark ? Colors.white : Colors.black,
           ),
           onPressed: () {
-            chatController.desconectar();
             goTo('home-admin');
           }),
       title: TextWidget(
@@ -112,7 +108,7 @@ class _ChamadoDetalheViewState extends State<ChamadoDetalheView> {
                                       if (GetUtils.isNullOrBlank(chamadoController.interacao.value.mensagem))
                                         exibirSnackErro('Preencha sua mensagem antes de enviar');
                                       else {
-                                        chamadoController.registrarInteracao();
+                                        // chamadoController.registrarInteracao();
                                       }
                                     }),
                               ],
@@ -131,13 +127,7 @@ class _ChamadoDetalheViewState extends State<ChamadoDetalheView> {
     var picker = await FilePickerCross.pick();
 
     if (picker != null) {
-      var fileName = picker.path.replaceAll('C:/fakepath/', '');
-
-      chamadoController.interacao.value.anexoBase64 = picker.toBase64();
-      chamadoController.interacao.value.anexoNome = fileName;
-
-      await chamadoController.registrarInteracao();
-      chatController.enviarMensagem();
+      await chamadoController.registrarInteracao(cross: picker);
     }
   }
 
@@ -202,11 +192,11 @@ class _ChamadoDetalheViewState extends State<ChamadoDetalheView> {
                 elevation: 0,
                 color: obterCorCard(interacao.usuarioId),
                 child: ListTile(
-                  title: TextWidget(text: chamado.id.toString()),
+                  title: TextWidget(text: interacao.usuarioNome),
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      TextWidget(text: interacao.mensagem),
+                      TextWidget(text: GetUtils.isNullOrBlank(interacao.mensagem) ? interacao.anexoNome : interacao.mensagem),
                       GetUtils.isNullOrBlank(interacao.anexoCaminho) ? renderNothing() : renderAnexo(interacao.anexoCaminho)
                     ],
                   ),
@@ -217,30 +207,21 @@ class _ChamadoDetalheViewState extends State<ChamadoDetalheView> {
   }
 
   renderContainer(Chamado chamado) {
-    return Expanded(
-      child: Container(
-        width: 500,
-        child: ListView(
-          children: [
-            SizedBox(height: 20),
-            TextWidget(
-              text: 'Informações do atendimento #${chamado.id}',
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
-            ),
-            Divider(),
-            TextWidget(text: "${chamado.titulo}"),
-            TextWidget(text: "Última interação por ${chamado.ultimaInteracaoPor}"),
-            TextWidget(text: "Data de abertura ${chamado.dataHora}"),
-            RaisedButton(
-              onPressed: kIsWeb ? _selectFile : _selectFileMobile,
-              child: Text('Select File'),
-            ),
-            Text('File path: $_filePath (Might cause issues on web)\n'),
-            Text('File length: $_fileLength\n'),
-            Text('File as String: $_fileString\n'),
-          ],
-        ),
+    return Container(
+      width: 400,
+      child: ListView(
+        children: [
+          SizedBox(height: 20),
+          TextWidget(
+            text: 'Informações do atendimento #${chamado.id}',
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
+          Divider(),
+          TextWidget(text: "${chamado.titulo}"),
+          TextWidget(text: "Última interação por ${chamado.ultimaInteracaoPor}"),
+          TextWidget(text: "Data de abertura ${chamado.dataHora}"),
+        ],
       ),
     );
   }
@@ -255,7 +236,7 @@ class _ChamadoDetalheViewState extends State<ChamadoDetalheView> {
     var fileName = file.path.replaceAll("/data/user/0/com.example.rocha_contabilidade/cache/file_picker/", "");
     chamadoController.interacao.value.anexoNome = fileName;
 
-    await chamadoController.registrarInteracao();
+    // await chamadoController.registrarInteracao();
   }
 
   obterCorCard(String usuarioId) {

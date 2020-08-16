@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:rocha_contabilidade/app/cliente/domain/chamado.dart';
 import 'package:rocha_contabilidade/app/shared/repository/api-repository.dart';
 import 'package:rocha_contabilidade/app/utils/common.dart';
@@ -36,8 +37,8 @@ class ChamadoRepository {
     }
   }
 
-  registrarInteracao(Map<String, dynamic> data) async {
-    var response = await apiRepository.post('Chamado/InserirInteracao', data);
+  registrarInteracao(dynamic data) async {
+    var response = await apiRepository.postData('Chamado/InserirInteracao', data);
 
     if (response.statusCode != 200) {
       exibirSnackErro('Ocorreu um erro ao enviar a mensagem, tente novamente.');
@@ -49,8 +50,7 @@ class ChamadoRepository {
 
     if (response.statusCode == 200) {
       exibirSnackSucesso('Novo chamado criado');
-      Future.delayed(Duration(seconds: 2),
-          () => goTo('/chamado-detalhe/${response.data}'));
+      Future.delayed(Duration(seconds: 2), () => goTo('/chamado-detalhe/${response.data}'));
     } else {
       exibirSnackErro('Ocorreu um erro ao inserir o chamado, tente novamente.');
     }

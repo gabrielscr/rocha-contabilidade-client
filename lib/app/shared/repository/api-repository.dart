@@ -19,8 +19,14 @@ class ApiRepository {
       return response;
   }
 
-  Future<Response> post(String endpoint, Map<String, dynamic> data) async {
+  Future<Response> post(String endpoint, dynamic data) async {
     final headers = await getHeaders();
+
+    return await dio.post('${Constants.apiUrl}/$endpoint', data: data, options: Options(headers: headers));
+  }
+
+  Future<Response> postData(String endpoint, dynamic data) async {
+    final headers = await getHeadersPost();
 
     return await dio.post('${Constants.apiUrl}/$endpoint', data: data, options: Options(headers: headers));
   }
@@ -41,6 +47,14 @@ class ApiRepository {
     final SharedPreferences prefs = await sharedPreferences;
     var token = prefs.getString('token');
     Map<String, String> headers = {"Content-Type": "application/json", "Authorization": "Bearer $token"};
+
+    return headers;
+  }
+
+  Future<Map<String, String>> getHeadersPost() async {
+    final SharedPreferences prefs = await sharedPreferences;
+    var token = prefs.getString('token');
+    Map<String, String> headers = {"Authorization": "Bearer $token"};
 
     return headers;
   }
