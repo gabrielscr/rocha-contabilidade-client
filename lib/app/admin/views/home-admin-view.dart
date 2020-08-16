@@ -47,7 +47,7 @@ class HomeAdminView extends StatelessWidget {
           ? IconButton(
               icon: Icon(
                 Icons.short_text,
-                color: Colors.black,
+                color: isModoDark ? Colors.white : Colors.black,
               ),
               onPressed: () => menuKey.currentState.openDrawer())
           : renderNothing(),
@@ -55,7 +55,10 @@ class HomeAdminView extends StatelessWidget {
         Row(
           children: [
             IconButton(
-                icon: Icon(MdiIcons.moonLastQuarter),
+                icon: Icon(
+                  Icons.lightbulb_outline,
+                  color: isModoDark ? Colors.white : Colors.black,
+                ),
                 onPressed: () {
                   ThemeController.to.modoDark.value = !ThemeController.to.modoDark.value;
 

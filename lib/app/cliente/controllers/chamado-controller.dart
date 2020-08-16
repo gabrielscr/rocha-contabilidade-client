@@ -1,16 +1,14 @@
-import 'dart:convert';
+import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:file_picker_cross/file_picker_cross.dart';
 import 'package:get/get.dart';
-import 'package:http_parser/http_parser.dart';
 import 'package:rocha_contabilidade/app/cliente/domain/anexo.dart';
 import 'package:rocha_contabilidade/app/cliente/domain/arquivo.dart';
 import 'package:rocha_contabilidade/app/cliente/domain/chamado.dart';
 import 'package:rocha_contabilidade/app/cliente/domain/interacao.dart';
 import 'package:rocha_contabilidade/app/cliente/domain/novo-chamado.dart';
 import 'package:rocha_contabilidade/app/cliente/repository/chamado-repository.dart';
-import 'package:rocha_contabilidade/app/cliente/repository/upload-repository.dart';
 
 class ChamadoController extends GetxController {
   ChamadoRepository repository = ChamadoRepository();
@@ -55,32 +53,46 @@ class ChamadoController extends GetxController {
     carregandoInteracao.value = value;
   }
 
-  registrarInteracao({FilePickerCross cross}) async {
+  registrarInteracao({File file, FilePickerCross cross}) async {
     changeCarregandoInteracao(true);
 
     interacao.value.chamadoId = chamado.value.id;
 
-    var xd = MultipartFile.fromBytes(cross.toUint8List(), filename: cross.path.replaceAll('C:/fakepath/', ''));
+    var formData = FormData();
 
-    if (cross != null) {
-      var formData = FormData();
+    if (file != null) {
+      var bytes = await file.readAsBytes();
+
+      var fileName =
+          MultipartFile.fromBytes(bytes, filename: file.path.replaceAll('/data/user/0/com.example.rocha_contabilidade/cache/file_picker/', ''));
+
       formData.files.addAll([
         MapEntry(
           "anexo",
-          xd,
+          fileName,
         )
       ]);
-
-      formData.fields.add(MapEntry('chamadoId', chamado.value.id.toString()));
-
-      // FormData formData = FormData.fromMap({'chamadoId': chamado.value.id, 'mensagem': interacao.value.mensagem, 'anexo': xd});
-
-      await repository.registrarInteracao(formData);
-    } else {
-      await repository.registrarInteracao(interacao.value.toJson());
     }
 
-    obter(chamado.value.id);
+    if (cross != null) {
+      var fileName = MultipartFile.fromBytes(cross.toUint8List(), filename: cross.path.replaceAll('C:/fakepath/', ''));
+      formData.files.addAll([
+        MapEntry(
+          "anexo",
+          fileName,
+        )
+      ]);
+    }
+
+    if (cross == null && file == null) {
+      formData.fields.add(MapEntry('mensagem', interacao.value.mensagem));
+    }
+
+    formData.fields.add(MapEntry('chamadoId', chamado.value.id.toString()));
+
+    await repository.registrarInteracao(formData);
+
+    chamado.value = await repository.obter({'Id': chamado.value.id});
 
     limparInteracao();
 

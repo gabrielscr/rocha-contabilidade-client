@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:rocha_contabilidade/app/cliente/domain/chamado.dart';
 import 'package:rocha_contabilidade/app/shared/repository/api-repository.dart';
 import 'package:rocha_contabilidade/app/utils/common.dart';
@@ -19,7 +18,7 @@ class ChamadoRepository {
   }
 
   Future<List<Chamado>> listar(Map<String, dynamic> params) async {
-    var response = await apiRepository.get('Chamado/Listar', params);
+    var response = await apiRepository.get('Chamado/ListarPorUsuario', params);
 
     if (response.statusCode == 200) {
       List<Chamado> chamados = [];

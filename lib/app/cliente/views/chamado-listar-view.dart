@@ -5,6 +5,7 @@ import 'package:rocha_contabilidade/app/cliente/controllers/chamado-controller.d
 import 'package:rocha_contabilidade/app/cliente/domain/chamado.dart';
 import 'package:rocha_contabilidade/app/utils/common.dart';
 import 'package:rocha_contabilidade/app/utils/routes.dart';
+import 'package:rocha_contabilidade/app/widgets/loader-widget.dart';
 import 'package:rocha_contabilidade/app/widgets/text-widget.dart';
 
 class ChamadoListarView extends StatelessWidget {
@@ -28,9 +29,7 @@ class ChamadoListarView extends StatelessWidget {
                   Row(
                     children: [
                       renderChamados(sizingInfo, controller.chamados.value),
-                      sizingInfo.isMobile
-                          ? renderNothing()
-                          : renderAberturaChamado()
+                      sizingInfo.isMobile ? renderNothing() : renderAberturaChamado()
                     ],
                   )
                 ],
@@ -47,12 +46,7 @@ class ChamadoListarView extends StatelessWidget {
       leading: renderNothing(),
       elevation: 0,
       title: TextWidget(text: 'Meus atendimentos'),
-      actions: [
-        sizingInfo.isMobile
-            ? FlatButton(
-                onPressed: () {}, child: TextWidget(text: 'Abrir novo'))
-            : renderNothing()
-      ],
+      actions: [sizingInfo.isMobile ? FlatButton(onPressed: () => goTo('chamado-abrir'), child: TextWidget(text: 'Abrir novo')) : renderNothing()],
     );
   }
 
@@ -64,20 +58,18 @@ class ChamadoListarView extends StatelessWidget {
         children: [
           SizedBox(height: 20),
           Container(
+            padding: EdgeInsets.all(10),
             child: Center(
-              child: TextWidget(
-                  text:
-                      'Você pode consultar seus chamados em aberto e caso necessite, abrir novos.'),
+              child: TextWidget(text: 'Você pode consultar seus chamados em aberto e caso necessite, abrir novos.'),
             ),
           ),
           Expanded(
             child: Container(
+              padding: EdgeInsets.all(10),
               child: chamadoController.carregando.value
-                  ? Center(child: CircularProgressIndicator())
+                  ? LoaderWidget()
                   : chamados.length == 0
-                      ? Center(
-                          child: TextWidget(
-                              text: 'Nenhum chamado aberto até o momento.'))
+                      ? Center(child: TextWidget(text: 'Nenhum chamado aberto até o momento.'))
                       : ListView.builder(
                           itemCount: chamados.length,
                           itemBuilder: (context, index) {
@@ -85,16 +77,11 @@ class ChamadoListarView extends StatelessWidget {
 
                             return Card(
                               child: ListTile(
-                                onTap: () =>
-                                    goTo('/chamado-detalhe/${chamado.id}'),
-                                title: TextWidget(
-                                    text: 'Chamado #${chamado.id}',
-                                    fontWeight: FontWeight.bold),
+                                onTap: () => goTo('/chamado-detalhe/${chamado.id}'),
+                                title: TextWidget(text: 'Chamado #${chamado.id}', fontWeight: FontWeight.bold),
                                 subtitle: TextWidget(text: chamado.titulo),
                                 trailing: Chip(
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(2)),
-                                    label: TextWidget(text: 'Em análise')),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)), label: TextWidget(text: 'Em análise')),
                               ),
                               elevation: 0,
                             );
@@ -116,9 +103,7 @@ class ChamadoListarView extends StatelessWidget {
               'assets/images/atendimento.png',
               scale: 1.5,
             ),
-            Center(
-                child: TextWidget(
-                    text: 'Precisa de ajuda? Abra um chamado abaixo')),
+            Center(child: TextWidget(text: 'Precisa de ajuda? Abra um chamado abaixo')),
             Center(child: TextWidget(text: 'Estamos aqui para ajudar você.')),
             RaisedButton(
               elevation: 0,

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -9,10 +10,10 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 import 'package:rocha_contabilidade/app/cliente/controllers/chamado-controller.dart';
-import 'package:rocha_contabilidade/app/cliente/controllers/chat-controller.dart';
 import 'package:rocha_contabilidade/app/cliente/domain/chamado.dart';
 import 'package:rocha_contabilidade/app/utils/common.dart';
 import 'package:rocha_contabilidade/app/utils/routes.dart';
+import 'package:rocha_contabilidade/app/widgets/loader-widget.dart';
 import 'package:rocha_contabilidade/app/widgets/text-widget.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -26,27 +27,26 @@ class _ChamadoDetalheViewState extends State<ChamadoDetalheView> {
 
   final ChamadoController chamadoController = Get.put(ChamadoController());
 
-  final ScrollController scrollController = ScrollController();
-
-  final TextEditingController msgController = TextEditingController();
-
-  String _fileString;
-
-  int _fileLength = 0;
-
-  String _filePath;
+  ScrollController scrollController;
 
   @override
   Widget build(BuildContext context) {
     return GetX<ChamadoController>(initState: (_) async {
+      scrollController = ScrollController(initialScrollOffset: 0);
       chamadoController.obter(int.parse(id));
     }, builder: (controller) {
       return Scaffold(
           appBar: renderAppBar(),
-          body: Visibility(
-              visible: !controller.carregando.value,
-              replacement: Center(child: CircularProgressIndicator()),
-              child: renderBody(controller.chamado.value)));
+          body: Visibility(visible: !controller.carregando.value, replacement: LoaderWidget(), child: renderBody(controller.chamado.value)));
+    });
+  }
+
+  scrollToBottom() {
+    print('scroll');
+    Timer(Duration(milliseconds: 100), () {
+      if (scrollController.hasClients) {
+        scrollController.animateTo(scrollController.position.maxScrollExtent, duration: Duration(milliseconds: 100), curve: Curves.decelerate);
+      }
     });
   }
 
@@ -68,67 +68,66 @@ class _ChamadoDetalheViewState extends State<ChamadoDetalheView> {
   }
 
   renderBody(Chamado chamado) {
-    return ResponsiveBuilder(builder: (context, sizingInfo) {
-      return Container(
-          child: Row(
-        children: [
-          Expanded(
-            child: Container(
-              child: Column(
-                children: [
-                  SizedBox(height: 20),
-                  TextWidget(
-                    text: 'Interações',
-                    fontSize: 18,
-                  ),
-                  SizedBox(height: 10),
-                  renderInteracoes(chamado),
-                  Card(
-                      elevation: 0,
-                      child: chamadoController.carregandoInteracao.value
-                          ? Center(
-                              child: CircularProgressIndicator(
-                                strokeWidth: 1,
-                              ),
-                            )
-                          : Row(
-                              children: [
-                                Expanded(
+    return GetBuilder<ChamadoController>(
+      builder: (controller) {
+        return ResponsiveBuilder(builder: (context, sizingInfo) {
+          return Container(
+              child: Row(
+            children: [
+              Expanded(
+                child: Container(
+                  child: Column(
+                    children: [
+                      SizedBox(height: 20),
+                      TextWidget(
+                        text: 'Interações',
+                        fontSize: 18,
+                      ),
+                      SizedBox(height: 10),
+                      renderInteracoes(chamado),
+                      Card(
+                          elevation: 0,
+                          child: Obx(() => Visibility(
+                              visible: !controller.carregandoInteracao.value,
+                              replacement: LoaderWidget(),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                      child: Container(
+                                    padding: EdgeInsets.only(left: 10, bottom: 5),
                                     child: TextFormField(
-                                  onChanged: (msg) => chamadoController.interacao.update((value) => value.mensagem = msg),
-                                  decoration: InputDecoration(hintStyle: GoogleFonts.muli(), hintText: 'Digite uma mensagem...'),
-                                )),
-                                IconButton(icon: Icon(Icons.attach_file, color: Colors.black), onPressed: kIsWeb ? _selectFile : _selectFileMobile),
-                                IconButton(
-                                    icon: Icon(
-                                      Icons.send,
-                                      color: Colors.blue,
+                                      onChanged: (msg) => controller.interacao.update((value) => value.mensagem = msg),
+                                      decoration: InputDecoration(hintStyle: GoogleFonts.muli(), hintText: 'Digite uma mensagem...'),
                                     ),
-                                    onPressed: () {
-                                      if (GetUtils.isNullOrBlank(chamadoController.interacao.value.mensagem))
-                                        exibirSnackErro('Preencha sua mensagem antes de enviar');
-                                      else {
-                                        // chamadoController.registrarInteracao();
-                                      }
-                                    }),
-                              ],
-                            ))
-                ],
+                                  )),
+                                  IconButton(
+                                      icon: Icon(Icons.attach_file, color: isModoDark ? Colors.white : Colors.black),
+                                      onPressed: kIsWeb ? _selectFile : _selectFileMobile),
+                                  IconButton(
+                                      icon: Icon(
+                                        Icons.send,
+                                        color: Colors.blue,
+                                      ),
+                                      onPressed: () {
+                                        if (GetUtils.isNullOrBlank(chamadoController.interacao.value.mensagem))
+                                          exibirSnackErro('Preencha sua mensagem antes de enviar');
+                                        else {
+                                          chamadoController.registrarInteracao();
+                                          scrollToBottom();
+                                        }
+                                      }),
+                                ],
+                              ))))
+                    ],
+                  ),
+                ),
               ),
-            ),
-          ),
-          renderContainer(chamado)
-        ],
-      ));
-    });
-  }
-
-  _selectFile() async {
-    var picker = await FilePickerCross.pick();
-
-    if (picker != null) {
-      await chamadoController.registrarInteracao(cross: picker);
-    }
+              GetPlatform.isAndroid || GetPlatform.isIOS || sizingInfo.isMobile || sizingInfo.isTablet ? renderNothing() : renderContainer(chamado)
+            ],
+          ));
+        });
+      },
+    );
   }
 
   renderAnexo(String anexo) {
@@ -145,6 +144,18 @@ class _ChamadoDetalheViewState extends State<ChamadoDetalheView> {
         ),
       );
 
+    if (anexo.contains('.xlsx') || anexo.contains('.xls'))
+      return Align(
+          alignment: Alignment.centerLeft,
+          child: InkWell(
+            onTap: () => launch(anexo),
+            child: Image.asset(
+              'assets/images/excel.png',
+              width: 300,
+              height: 300,
+            ),
+          ));
+
     if (anexo.contains('.docx'))
       return Align(
           alignment: Alignment.centerLeft,
@@ -156,7 +167,7 @@ class _ChamadoDetalheViewState extends State<ChamadoDetalheView> {
               height: 300,
             ),
           ));
-    if (anexo.contains('.jpg') || anexo.contains('.png') || anexo.contains('.webp') || anexo.contains('.jpeg'))
+    if (anexo.contains('.jpg') || anexo.contains('.png') || anexo.contains('.webp') || anexo.contains('.jpeg') || anexo.contains('.gif'))
       return Align(
           alignment: Alignment.centerLeft,
           child: InkWell(
@@ -181,6 +192,7 @@ class _ChamadoDetalheViewState extends State<ChamadoDetalheView> {
   }
 
   renderInteracoes(Chamado chamado) {
+    scrollToBottom();
     return Expanded(
         child: ListView.builder(
             controller: scrollController,
@@ -229,14 +241,16 @@ class _ChamadoDetalheViewState extends State<ChamadoDetalheView> {
   _selectFileMobile() async {
     File file = await FilePicker.getFile();
 
-    var bytes = await file.readAsBytes();
-    var base64file = base64.encode(bytes);
+    await chamadoController.registrarInteracao(file: file);
+  }
 
-    chamadoController.interacao.value.anexoBase64 = base64file;
-    var fileName = file.path.replaceAll("/data/user/0/com.example.rocha_contabilidade/cache/file_picker/", "");
-    chamadoController.interacao.value.anexoNome = fileName;
+  _selectFile() async {
+    var picker = await FilePickerCross.pick();
 
-    // await chamadoController.registrarInteracao();
+    if (picker != null) {
+      await chamadoController.registrarInteracao(cross: picker);
+      scrollToBottom();
+    }
   }
 
   obterCorCard(String usuarioId) {
