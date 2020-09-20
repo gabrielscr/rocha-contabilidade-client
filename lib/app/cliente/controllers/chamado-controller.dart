@@ -40,7 +40,15 @@ class ChamadoController extends GetxController {
   listar() async {
     changeCarregando(true);
 
-    chamados.value = await repository.listar({});
+    chamados.value = await repository.listar({}, 'ListarPorUsuario');
+
+    changeCarregando(false);
+  }
+
+  listarTudo() async {
+    changeCarregando(true);
+
+    chamados.value = await repository.listar({}, 'Listar');
 
     changeCarregando(false);
   }

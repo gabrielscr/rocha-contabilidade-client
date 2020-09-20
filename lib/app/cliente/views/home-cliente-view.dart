@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:responsive_builder/responsive_builder.dart';
+import 'package:rocha_contabilidade/app/cliente/views/chamado-listar-view.dart';
 import 'package:rocha_contabilidade/app/shared/controllers/auth-controller.dart';
 import 'package:rocha_contabilidade/app/shared/controllers/theme-controller.dart';
 import 'package:rocha_contabilidade/app/utils/common.dart';
+import 'package:rocha_contabilidade/app/utils/routes.dart';
 import 'package:rocha_contabilidade/app/widgets/text-widget.dart';
 
-import 'chamado-admin-listar-view.dart';
-
-class HomeAdminView extends StatelessWidget {
+class HomeClienteView extends StatelessWidget {
   final PageController controller = PageController(
     initialPage: 0,
   );
@@ -39,7 +39,7 @@ class HomeAdminView extends StatelessWidget {
 
   renderAppBar(SizingInformation sizingInfo) {
     return AppBar(
-      title: TextWidget(text: 'Global Contabilidade - Admin'),
+      title: TextWidget(text: 'Global Contabilidade'),
       elevation: 0,
       backgroundColor: isModoDark ? Colors.black : Colors.white,
       leading: sizingInfo.isMobile || sizingInfo.isTablet
@@ -97,7 +97,7 @@ class HomeAdminView extends StatelessWidget {
       child: Container(
         child: PageView(
           controller: controller,
-          children: [ChamadoAdminListarView()],
+          children: [ChamadoListarView()],
         ),
       ),
     );
@@ -111,12 +111,12 @@ class HomeAdminView extends StatelessWidget {
               subtitle: TextWidget(text: 'Seja bem vindo!'),
               trailing: IconButton(icon: Icon(MdiIcons.logout), onPressed: () => AuthController.to.logoff()),
             )),
-        renderMenuItem(Icons.open_in_browser, 'Atendimentos abertos', 'Todos os atendimentos abertos', () => controller.jumpToPage(0)),
+        renderMenuItem(Icons.headset_mic, 'Meus atendimentos', 'Consulte seus chamados', () => controller.jumpToPage(0)),
         Divider(
           color: Colors.grey[400],
           thickness: 0.5,
         ),
-        renderMenuItem(Icons.close_rounded, 'Atendimentos fechados', 'Todos os atendimentos fechados', () => controller.jumpToPage(0)),
+        renderMenuItem(Icons.email, 'Abrir chamado', 'Toque aqui para abrir', () => goTo('chamado-abrir'))
       ],
     );
   }

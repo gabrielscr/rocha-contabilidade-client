@@ -17,8 +17,8 @@ class ChamadoRepository {
     }
   }
 
-  Future<List<Chamado>> listar(Map<String, dynamic> params) async {
-    var response = await apiRepository.get('Chamado/ListarPorUsuario', params);
+  Future<List<Chamado>> listar(Map<String, dynamic> params, String endpoint) async {
+    var response = await apiRepository.get('Chamado/$endpoint', params);
 
     if (response.statusCode == 200) {
       List<Chamado> chamados = [];

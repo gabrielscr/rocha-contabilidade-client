@@ -18,7 +18,7 @@ class SplashView extends StatelessWidget {
           body: Container(
             child: Center(
               child: TextWidget(
-                text: 'ROCHA CONTABILIDADE',
+                text: 'GLOBAL CONTABILIDADE',
                 fontWeight: FontWeight.bold,
                 fontSize: 25,
               ),

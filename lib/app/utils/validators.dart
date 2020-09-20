@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:rocha_contabilidade/app/shared/controllers/auth-controller.dart';
 
 class Validators {
-  final AuthController authController = Get.find<AuthController>();
+  final AuthController authController = Get.put(AuthController());
 
   String validarEmail() {
     var email = authController.usuario.value.email;

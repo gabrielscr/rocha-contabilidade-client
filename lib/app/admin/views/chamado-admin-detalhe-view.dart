@@ -16,12 +16,12 @@ import 'package:rocha_contabilidade/app/widgets/loader-widget.dart';
 import 'package:rocha_contabilidade/app/widgets/text-widget.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class ChamadoDetalheView extends StatefulWidget {
+class ChamadoAdminDetalheView extends StatefulWidget {
   @override
   _ChamadoDetalheViewState createState() => _ChamadoDetalheViewState();
 }
 
-class _ChamadoDetalheViewState extends State<ChamadoDetalheView> {
+class _ChamadoDetalheViewState extends State<ChamadoAdminDetalheView> {
   String get id => Get.parameters["id"];
 
   final ChamadoController chamadoController = Get.put(ChamadoController());
@@ -57,7 +57,7 @@ class _ChamadoDetalheViewState extends State<ChamadoDetalheView> {
             color: isModoDark ? Colors.white : Colors.black,
           ),
           onPressed: () {
-            goTo('home-cliente');
+            goTo('home-admin');
           }),
       title: TextWidget(
         text: 'Detalhe do chamado',

@@ -37,7 +37,11 @@ class AuthController extends GetxController {
       goTo('login');
     } else {
       usuario.value = await authRepository.obterUsuario();
-      goTo('home-admin');
+
+      if (usuario.value.isAdmin)
+        goTo('home-admin');
+      else
+        goTo('home-cliente');
     }
   }
 
@@ -51,7 +55,10 @@ class AuthController extends GetxController {
     if (authResult.authenticated) {
       await prefs.setString('token', authResult.accessToken);
       usuario.value = await authRepository.obterUsuario();
-      goTo('home-admin');
+      if (usuario.value.isAdmin)
+        goTo('home-admin');
+      else
+        goTo('home-cliente');
     } else {
       exibirSnackErro('Usuário ou senha inválidos');
     }
@@ -62,6 +69,7 @@ class AuthController extends GetxController {
   logoff() async {
     final SharedPreferences prefs = await sharedPreferences;
     prefs.remove('token');
+    limparDados();
     goToAll('login');
   }
 

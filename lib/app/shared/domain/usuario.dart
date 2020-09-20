@@ -5,6 +5,7 @@ class Usuario {
   String fotoUrl;
   String dataNascimento;
   bool preenchido;
+  bool isAdmin;
   String cpf;
   String celular;
   String ddd;
@@ -20,6 +21,7 @@ class Usuario {
       this.fotoUrl,
       this.dataNascimento,
       this.preenchido,
+      this.isAdmin,
       this.cpf,
       this.celular,
       this.ddd,
@@ -35,13 +37,12 @@ class Usuario {
     fotoUrl = json['fotoUrl'];
     dataNascimento = json['dataNascimento'];
     preenchido = json['preenchido'];
+    isAdmin = json['isAdmin'];
     cpf = json['cpf'];
     celular = json['celular'];
     ddd = json['ddd'];
     login = json['login'];
-    endereco = json['endereco'] != null
-        ? new Endereco.fromJson(json['endereco'])
-        : null;
+    endereco = json['endereco'] != null ? new Endereco.fromJson(json['endereco']) : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -73,14 +74,7 @@ class Endereco {
   String bairro;
   String uf;
 
-  Endereco(
-      {this.cep,
-      this.cidade,
-      this.logradouro,
-      this.numero,
-      this.complemento,
-      this.bairro,
-      this.uf});
+  Endereco({this.cep, this.cidade, this.logradouro, this.numero, this.complemento, this.bairro, this.uf});
 
   Endereco.fromJson(Map<String, dynamic> json) {
     cep = json['cep'];

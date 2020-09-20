@@ -23,15 +23,8 @@ class LoginView extends StatelessWidget {
                     children: [
                       Container(
                         child: TextWidget(
-                          text: 'ROCHA CONTABILIDADE',
+                          text: 'GLOBAL CONTABILIDADE',
                           fontSize: sizingInfo.isDesktop ? 40 : 25,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Container(
-                        child: TextWidget(
-                          text: 'ONLINE',
-                          fontSize: sizingInfo.isDesktop ? 40 : 15,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
